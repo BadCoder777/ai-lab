@@ -33,6 +33,13 @@ const colorBarMap: Record<string, string> = {
   "from-zinc-500": "bg-zinc-500",
 };
 
+const collectionAccentMap: Record<string, { text: string; bg: string; border: string }> = {
+  personal: { text: "hover:text-amber-400", bg: "hover:bg-amber-500/10", border: "hover:border-amber-500/20" },
+  team: { text: "hover:text-sky-400", bg: "hover:bg-sky-500/10", border: "hover:border-sky-500/20" },
+  clients: { text: "hover:text-emerald-400", bg: "hover:bg-emerald-500/10", border: "hover:border-emerald-500/20" },
+  archive: { text: "hover:text-zinc-400", bg: "hover:bg-zinc-500/10", border: "hover:border-zinc-500/20" },
+};
+
 const mainMenuItems = [
   { icon: ExternalLink, label: "Open", action: "open" },
   { icon: Pencil, label: "Rename", action: "rename" },
@@ -126,6 +133,21 @@ export function ProjectRow({
           </p>
         </div>
 
+        {project.collectionId && (() => {
+          const accent = collectionAccentMap[project.collectionId] ?? collectionAccentMap.personal;
+          return (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/collections/${project.collectionId}`);
+            }}
+            className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs text-zinc-400 bg-white/[0.03] border border-white/[0.06] ${accent.text} ${accent.bg} ${accent.border} transition-colors duration-150`}
+          >
+            #{collections.find(c => c.id === project.collectionId)?.name ?? project.collectionId}
+          </button>
+          );
+        })()}
+
         <div className="flex items-center gap-1.5 text-xs text-zinc-500 shrink-0">
           <Clock className="w-3 h-3" />
           {project.updatedAt}
@@ -174,20 +196,15 @@ export function ProjectRow({
                     right: menuPosition.right,
                     zIndex: 9999,
                   }}
-                  className="w-44 rounded-xl bg-zinc-900 border border-white/[0.08] shadow-xl shadow-black/30 backdrop-blur-xl overflow-hidden"
+                  className="rounded-xl bg-zinc-900 border border-white/[0.08] shadow-xl shadow-black/30 backdrop-blur-xl"
                 >
-                  <motion.div
-                    animate={{
-                      x: submenu === "collections" ? -MENU_WIDTH : 0,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 350,
-                      damping: 32,
-                    }}
-                    className="flex"
-                  >
-                    <div className="w-44 shrink-0 py-1.5">
+                  <div style={{ overflow: "hidden", width: MENU_WIDTH }}>
+                    <motion.div
+                      animate={{ x: submenu === "collections" ? -MENU_WIDTH : 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="flex"
+                    >
+                      <div style={{ width: MENU_WIDTH }} className="shrink-0 py-1.5">
                       {(isTrash ? trashMenuItems : mainMenuItems).map(
                         (item) => (
                           <button
@@ -208,7 +225,7 @@ export function ProjectRow({
                       )}
                     </div>
 
-                    <div className="w-44 shrink-0 py-1.5">
+                    <div style={{ width: MENU_WIDTH }} className="shrink-0 py-1.5">
                       <button
                         onClick={() => setSubmenu("main")}
                         className="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-zinc-300 hover:bg-white/[0.06] hover:text-zinc-100 transition-colors"
@@ -245,6 +262,7 @@ export function ProjectRow({
                       })}
                     </div>
                   </motion.div>
+                </div>
                 </motion.div>
               </>
             )}
