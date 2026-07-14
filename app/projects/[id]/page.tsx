@@ -1,4 +1,5 @@
 import { projects } from "@/lib/mock-data";
+import { ProjectWorkspace } from "@/components/project-workspace";
 
 export default async function ProjectPage({
   params,
@@ -8,9 +9,13 @@ export default async function ProjectPage({
   const { id } = await params;
   const project = projects.find((p) => p.id === id);
 
-  return (
-    <h1 className="m-auto text-xl font-semibold text-zinc-100">
-      {project?.name ?? "Project not found"}
-    </h1>
-  );
+  if (!project) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-zinc-500 text-sm">Project not found</p>
+      </div>
+    );
+  }
+
+  return <ProjectWorkspace projectName={project.name} />;
 }
